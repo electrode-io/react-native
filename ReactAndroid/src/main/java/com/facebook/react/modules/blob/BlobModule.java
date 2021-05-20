@@ -159,7 +159,8 @@ public class BlobModule extends NativeBlobModuleSpec {
     // The application can register BlobProvider as a ContentProvider so that blobs are resolvable.
     // If it does, it needs to tell us what authority was used via this string resource.
     Resources resources = getReactApplicationContext().getResources();
-    String packageName = getReactApplicationContext().getPackageName();
+    String packageName = ReactApplicationContext.PACKAGE_NAME == null
+      ? getReactApplicationContext().getPackageName() : ReactApplicationContext.PACKAGE_NAME;
     int resourceId = resources.getIdentifier("blob_provider_authority", "string", packageName);
     if (resourceId == 0) {
       return MapBuilder.<String, Object>of();

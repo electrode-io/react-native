@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import androidx.annotation.Nullable;
+import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
@@ -60,7 +61,9 @@ public class ResourceDrawableIdHelper {
       if (mResourceDrawableIdMap.containsKey(name)) {
         return mResourceDrawableIdMap.get(name);
       }
-      int id = context.getResources().getIdentifier(name, "drawable", context.getPackageName());
+      int id = context.getResources().getIdentifier(name, "drawable",
+        ReactApplicationContext.PACKAGE_NAME == null
+          ? context.getPackageName() : ReactApplicationContext.PACKAGE_NAME);
       mResourceDrawableIdMap.put(name, id);
       return id;
     }
