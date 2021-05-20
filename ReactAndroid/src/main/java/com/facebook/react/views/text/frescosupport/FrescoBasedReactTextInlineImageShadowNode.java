@@ -15,6 +15,7 @@ import com.facebook.common.util.UriUtil;
 import com.facebook.drawee.controller.AbstractDraweeControllerBuilder;
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
@@ -118,7 +119,9 @@ public class FrescoBasedReactTextInlineImageShadowNode extends ReactTextInlineIm
       return null;
     }
     name = name.toLowerCase(Locale.getDefault()).replace("-", "_");
-    int resId = context.getResources().getIdentifier(name, "drawable", context.getPackageName());
+    int resId = context.getResources().getIdentifier(name, "drawable",
+      ReactApplicationContext.PACKAGE_NAME == null
+        ? context.getPackageName() : ReactApplicationContext.PACKAGE_NAME);
     return new Uri.Builder()
         .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
         .path(String.valueOf(resId))
