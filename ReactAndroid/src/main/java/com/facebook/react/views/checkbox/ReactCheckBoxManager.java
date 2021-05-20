@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.TintContextWrapper;
 import androidx.core.widget.CompoundButtonCompat;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -106,7 +107,9 @@ public class ReactCheckBoxManager extends SimpleViewManager<ReactCheckBox> {
    * access those attributes dynamically.
    */
   private static int getIdentifier(Context context, String name) {
-    return context.getResources().getIdentifier(name, "attr", context.getPackageName());
+    return context.getResources().getIdentifier(name, "attr",
+      ReactApplicationContext.PACKAGE_NAME == null
+        ? context.getPackageName() : ReactApplicationContext.PACKAGE_NAME);
   }
 
   @ReactProp(name = "tintColors")

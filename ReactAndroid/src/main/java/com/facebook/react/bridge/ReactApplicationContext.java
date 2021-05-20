@@ -20,4 +20,6 @@ public class ReactApplicationContext extends ReactContext {
   public ReactApplicationContext(Context context) {
     super(context.getApplicationContext());
   }
+
+  public static String PACKAGE_NAME = null;
 }

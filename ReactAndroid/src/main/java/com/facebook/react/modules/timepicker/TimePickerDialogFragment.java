@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -60,7 +61,9 @@ public class TimePickerDialogFragment extends DialogFragment {
             activityContext,
             activityContext
                 .getResources()
-                .getIdentifier("ClockTimePickerDialog", "style", activityContext.getPackageName()),
+                .getIdentifier("ClockTimePickerDialog", "style",
+                  ReactApplicationContext.PACKAGE_NAME == null
+                    ? activityContext.getPackageName() : ReactApplicationContext.PACKAGE_NAME),
             onTimeSetListener,
             hour,
             minute,
@@ -70,8 +73,9 @@ public class TimePickerDialogFragment extends DialogFragment {
             activityContext,
             activityContext
                 .getResources()
-                .getIdentifier(
-                    "SpinnerTimePickerDialog", "style", activityContext.getPackageName()),
+                .getIdentifier("SpinnerTimePickerDialog", "style",
+                  ReactApplicationContext.PACKAGE_NAME == null
+                    ? activityContext.getPackageName() : ReactApplicationContext.PACKAGE_NAME),
             onTimeSetListener,
             hour,
             minute,

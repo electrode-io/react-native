@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.widget.DatePicker;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -66,7 +67,9 @@ public class DatePickerDialogFragment extends DialogFragment {
                   activityContext
                       .getResources()
                       .getIdentifier(
-                          "CalendarDatePickerDialog", "style", activityContext.getPackageName()),
+                          "CalendarDatePickerDialog", "style",
+                          ReactApplicationContext.PACKAGE_NAME == null
+                          ? activityContext.getPackageName() : ReactApplicationContext.PACKAGE_NAME),
                   onDateSetListener,
                   year,
                   month,
