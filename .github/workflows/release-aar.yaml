@@ -19,7 +19,8 @@ jobs:
           echo "repositoryPassword=${OSSRH_SONATYPE_PASSWORD}" >> gradle.properties
           sed -i.bu 's/com.facebook.react/com.walmartlabs.ern/g' ReactAndroid/gradle.properties
           ./gradlew ReactAndroid:assembleRelease
-          ./gradlew ReactAndroid:uploadArchives
+          ./gradlew ReactAndroid:uploadArchives --info
+          ./gradlew ReactAndroid:clean
         env:
           OSSRH_GPG_SECRET_KEY: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
           OSSRH_GPG_SECRET_KEY_PASSWORD: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}

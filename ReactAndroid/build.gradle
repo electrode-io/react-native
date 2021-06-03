@@ -8,9 +8,10 @@
 plugins {
     id("com.android.library")
     id("com.facebook.react.codegen")
-    id("maven-publish")
     id("de.undercouch.download")
 }
+
+apply from: 'release.gradle'
 
 import java.nio.file.Paths
 
@@ -378,10 +379,6 @@ task extractJNIFiles {
     }
 }
 
-task installArchives {
-    dependsOn("publishReleasePublicationToNpmRepository")
-}
-
 android {
     compileSdkVersion 30
     ndkVersion ANDROID_NDK_VERSION
@@ -476,54 +473,4 @@ react {
     jsRootDir = file("../Libraries")
     reactNativeRootDir = file("$projectDir/..")
     useJavaGenerator = System.getenv("USE_CODEGEN_JAVAPOET") ?: false
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                // Applies the component for the release build variant.
-                from components.release
-
-                // You can then customize attributes of the publication as shown below.
-                artifactId = POM_ARTIFACT_ID
-                groupId = GROUP
-                version = VERSION_NAME
-
-                pom {
-                    name = POM_NAME
-                    description = "A framework for building native apps with React"
-                    url = "https://github.com/facebook/react-native"
-
-                    developers {
-                        developer {
-                            id = "facebook"
-                            name = "Facebook"
-                        }
-                    }
-
-                    licenses {
-                        license {
-                            name = "MIT License"
-                            url = "https://github.com/facebook/react-native/blob/master/LICENSE"
-                            distribution = "repo"
-                        }
-                    }
-
-                    scm {
-                        url = "https://github.com/facebook/react-native.git"
-                        connection = "scm:git:https://github.com/facebook/react-native.git"
-                        developerConnection = "scm:git:git@github.com:facebook/react-native.git"
-                    }
-                }
-            }
-        }
-
-        repositories {
-            maven {
-                name = "npm"
-                url = AAR_OUTPUT_URL
-            }
-        }
-    }
 }
