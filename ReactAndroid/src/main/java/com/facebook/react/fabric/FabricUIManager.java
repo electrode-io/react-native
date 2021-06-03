@@ -625,6 +625,7 @@ public class FabricUIManager implements UIManager, LifecycleEventListener {
       final String componentName,
       @Nullable ReadableMap props,
       @Nullable Object stateWrapper,
+      @Nullable Object eventEmitterWrapper,
       boolean isLayoutable) {
 
     mMountItemDispatcher.addPreAllocateMountItem(
@@ -634,6 +635,7 @@ public class FabricUIManager implements UIManager, LifecycleEventListener {
             getFabricComponentName(componentName),
             props,
             (StateWrapper) stateWrapper,
+            (EventEmitterWrapper) eventEmitterWrapper,
             isLayoutable));
   }
 
@@ -779,6 +781,30 @@ public class FabricUIManager implements UIManager, LifecycleEventListener {
   @Override
   public void receiveEvent(
       int surfaceId, int reactTag, String eventName, @Nullable WritableMap params) {
+    receiveEvent(surfaceId, reactTag, eventName, false, 0, params);
+  }
+
+  /**
+   * receiveEvent API that emits an event to C++. If `canCoalesceEvent` is true, that signals that
+   * C++ may coalesce the event optionally. Otherwise, coalescing can happen in Java before
+   * emitting.
+   *
+   * <p>`customCoalesceKey` is currently unused.
+   *
+   * @param surfaceId
+   * @param reactTag
+   * @param eventName
+   * @param canCoalesceEvent
+   * @param customCoalesceKey
+   * @param params
+   */
+  public void receiveEvent(
+      int surfaceId,
+      int reactTag,
+      String eventName,
+      boolean canCoalesceEvent,
+      int customCoalesceKey,
+      @Nullable WritableMap params) {
     if (ReactBuildConfig.DEBUG && surfaceId == View.NO_ID) {
       FLog.d(TAG, "Emitted event without surfaceId: [%d] %s", reactTag, eventName);
     }
@@ -791,7 +817,11 @@ public class FabricUIManager implements UIManager, LifecycleEventListener {
       return;
     }
 
-    eventEmitter.invoke(eventName, params);
+    if (canCoalesceEvent) {
+      eventEmitter.invoke(eventName, params);
+    } else {
+      eventEmitter.invokeUnique(eventName, params, customCoalesceKey);
+    }
   }
 
   @Override
