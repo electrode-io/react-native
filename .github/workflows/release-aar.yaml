@@ -1,0 +1,27 @@
+name: Release React Native AAR
+# This workflow is manually triggered to release a new React Native AAR version
+on:
+  workflow_dispatch:
+
+jobs:
+  release-aar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: |
+          cat <(echo -e "${{ secrets.OSSRH_GPG_SECRET_KEY }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+          yarn install
+          echo "signing.gnupg.keyName=${OSSRH_GPG_SECRET_KEY_ID}" >> gradle.properties
+          echo "signing.gnupg.passphrase=${OSSRH_GPG_SECRET_KEY_PASSWORD}" >> gradle.properties
+          echo "repositoryUsername=${OSSRH_SONATYPE_USERNAME}" >> gradle.properties
+          echo "repositoryPassword=${OSSRH_SONATYPE_PASSWORD}" >> gradle.properties
+          sed -i.bu 's/com.facebook.react/com.walmartlabs.ern/g' ReactAndroid/gradle.properties
+          ./gradlew ReactAndroid:assembleRelease
+          ./gradlew ReactAndroid:uploadArchives
+        env:
+          OSSRH_GPG_SECRET_KEY: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+          OSSRH_GPG_SECRET_KEY_PASSWORD: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+          OSSRH_SONATYPE_USERNAME: ${{ secrets.OSSRH_SONATYPE_USERNAME }}
+          OSSRH_SONATYPE_PASSWORD: ${{ secrets.OSSRH_SONATYPE_PASSWORD }}
