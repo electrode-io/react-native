@@ -109,10 +109,11 @@ afterEvaluate { project ->
 
     signing {
         required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+        useGpgCmd()
         sign(configurations.archives)
     }
 
-    uploadArchives {
+     uploadArchives {
         configuration = configurations.archives
         repositories.mavenDeployer {
             beforeDeployment {
