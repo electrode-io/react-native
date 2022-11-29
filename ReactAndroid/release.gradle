@@ -1,28 +1,8 @@
-/*
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
-apply(plugin: "maven")
-apply(plugin: "signing")
-
-ext {
-    AAR_OUTPUT_URL = "file://${projectDir}/../android"
-}
-
-// Gradle tasks for publishing to maven
-// 1) To install in local maven repo use :installArchives task
-// 2) To upload artifact to maven central use: :uploadArchives (you'd need to have the permission to do that)
-
-def isReleaseBuild() {
-    return VERSION_NAME.contains("SNAPSHOT") == false
-}
-
-def getRepositoryUrl() {
-    return project.findProperty("repositoryUrl") ?: "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-}
+def sonatypeUsername = getRepositoryUsername()
+def sonatypePassword = getRepositoryPassword()
 
 def getRepositoryUsername() {
     return project.findProperty("repositoryUsername") ?: ""
@@ -32,87 +12,72 @@ def getRepositoryPassword() {
     return project.findProperty("repositoryPassword") ?: ""
 }
 
-def configureReactNativePom(def pom) {
-    pom.project {
-        name(POM_NAME)
-        artifactId(POM_ARTIFACT_ID)
-        packaging(POM_PACKAGING)
-        description("A framework for building native apps with React")
-        url("https://github.com/facebook/react-native")
-
-        scm {
-            url("https://github.com/facebook/react-native.git")
-            connection("scm:git:https://github.com/facebook/react-native.git")
-            developerConnection("scm:git:git@github.com:facebook/react-native.git")
-        }
-
-        licenses {
-            license {
-                name("MIT License")
-                url("https://github.com/facebook/react-native/blob/master/LICENSE")
-                distribution("repo")
-            }
-        }
-
-        developers {
-            developer {
-                id("facebook")
-                name("Facebook")
-            }
-        }
-    }
+def isReleaseBuild() {
+    return VERSION_NAME.contains("SNAPSHOT") == false
 }
 
-if (JavaVersion.current().isJava8Compatible()) {
-    allprojects {
-        tasks.withType(Javadoc) {
-            options.addStringOption("Xdoclint:none", "-quiet")
-        }
-    }
-}
+// Gradle tasks for publishing to maven
+// ./gradlew assembleRelease
+// ./gradlew publish
+// Use Release-AAR github workflow to publish RN to MVN Central.
 
-afterEvaluate { project ->
-    android.libraryVariants.all { variant ->
-        def name = variant.name.capitalize()
-        task "jar${name}"(type: Jar, dependsOn: variant.javaCompileProvider.get()) {
-            from(variant.javaCompileProvider.get().destinationDir)
-        }
-    }
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                afterEvaluate {
+                    groupId = GROUP
+                    artifactId = POM_ARTIFACT_ID
+                    version = VERSION_NAME
+                    from components.release
+                }
 
-    version = VERSION_NAME
-    group = GROUP
+                pom {
+                    name = "react-native"
+                    description = "A framework for building native apps with React"
+                    url = "https://github.com/facebook/react-native"
 
-    signing {
-        required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
-        useGpgCmd()
-        sign(configurations.archives)
-    }
+                    developers {
+                        developer {
+                            id = "facebook"
+                            name = "Facebook"
+                        }
+                    }
 
-     uploadArchives {
-        configuration = configurations.archives
-        repositories.mavenDeployer {
-            beforeDeployment {
-                MavenDeployment deployment -> signing.signPom(deployment)
+                    licenses {
+                        license {
+                            name = "MIT License"
+                            url = "https://github.com/facebook/react-native/blob/HEAD/LICENSE"
+                            distribution = "repo"
+                        }
+                    }
+
+                    scm {
+                        url = "https://github.com/facebook/react-native.git"
+                        connection = "scm:git:https://github.com/facebook/react-native.git"
+                        developerConnection = "scm:git:git@github.com:facebook/react-native.git"
+                    }
+                }
             }
-
-            repository(url: getRepositoryUrl()) {
-                authentication(
-                        userName: getRepositoryUsername(),
-                        password: getRepositoryPassword())
-
-            }
-
-            configureReactNativePom(pom)
         }
-    }
 
-    task installArchives(type: Upload) {
-        configuration = configurations.archives
-        repositories.mavenDeployer {
-            // Deploy to react-native/android, ready to publish to npm
-            repository(url: AAR_OUTPUT_URL)
+        repositories {
+            if (sonatypeUsername && sonatypePassword) {
+                maven {
+                    name = "mavenCentral"
+                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    credentials {
+                        username = sonatypeUsername
+                        password = sonatypePassword
+                    }
+                }
+            }
+        }
 
-            configureReactNativePom(pom)
+        signing {
+            required { isReleaseBuild() }
+            useGpgCmd()
+            sign(publishing.publications.release)
         }
     }
 }

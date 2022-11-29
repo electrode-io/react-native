@@ -9,6 +9,7 @@ plugins {
     id("com.android.library")
     id("com.facebook.react")
     id("de.undercouch.download")
+    id("maven-publish")
 }
 
 apply from: 'release.gradle'
@@ -444,11 +445,18 @@ task extractJNIFiles {
 }
 
 android {
-    compileSdkVersion 30
-    ndkVersion ANDROID_NDK_VERSION
-    if (ANDROID_NDK_PATH != null) {
-        ndkPath ANDROID_NDK_PATH
-    }
+    compileSdkVersion 31
+
+    // Used to override the NDK path/version on internal CI or by allowing
+    // users to customize the NDK path/version from their root project (e.g. for M1 support)
+    // if (rootProject.hasProperty("ndkPath")) {
+    //     ndkPath rootProject.ext.ndkPath
+    // }
+    // if (rootProject.hasProperty("ndkVersion")) {
+    //     ndkVersion rootProject.ext.ndkVersion
+    // }
+
+    ndkVersion = "21.4.7075529"
 
     defaultConfig {
         minSdkVersion(21)
