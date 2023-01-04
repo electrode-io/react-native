@@ -8,12 +8,12 @@
 plugins {
     id("com.android.library")
     id("com.facebook.react")
-    id("maven-publish")
     id("de.undercouch.download")
 }
 
-import com.facebook.react.tasks.internal.*
+apply from: 'release.gradle'
 
+import com.facebook.react.tasks.internal.*
 import java.nio.file.Paths
 
 import de.undercouch.gradle.tasks.download.Download
@@ -268,16 +268,6 @@ final def extractNativeDependencies = tasks.register('extractNativeDependencies'
     it.mustRunAfter(prepareHermes)
 }
 
-task installArchives {
-    dependsOn("publishReleasePublicationToNpmRepository")
-}
-
-// Creating sources with comments
-task androidSourcesJar(type: Jar) {
-  classifier = 'sources'
-  from android.sourceSets.main.java.srcDirs
-}
-
 android {
     compileSdkVersion 31
 
@@ -419,63 +409,4 @@ react {
     // We search for the codegen in either one of the `node_modules` folder or in the
     // root packages folder (that's for when we build from source without calling `yarn install`).
     codegenDir = file(findNodeModulePath(projectDir, "react-native-codegen") ?: "../packages/react-native-codegen/")
-}
-
-afterEvaluate {
-
-    // Needed as some of the native sources needs to be downloaded
-    // before configureNdkBuildDebug could be executed.
-    configureNdkBuildDebug.dependsOn(preBuild)
-    configureNdkBuildRelease.dependsOn(preBuild)
-
-    publishing {
-        publications {
-            release(MavenPublication) {
-                // Applies the component for the release build variant.
-                from components.release
-
-                // Add additional sourcesJar to artifacts
-                artifact(androidSourcesJar)
-
-                // You can then customize attributes of the publication as shown below.
-                artifactId = POM_ARTIFACT_ID
-                groupId = GROUP
-                version = VERSION_NAME
-
-                pom {
-                    name = POM_NAME
-                    description = "A framework for building native apps with React"
-                    url = "https://github.com/facebook/react-native"
-
-                    developers {
-                        developer {
-                            id = "facebook"
-                            name = "Facebook"
-                        }
-                    }
-
-                    licenses {
-                        license {
-                            name = "MIT License"
-                            url = "https://github.com/facebook/react-native/blob/HEAD/LICENSE"
-                            distribution = "repo"
-                        }
-                    }
-
-                    scm {
-                        url = "https://github.com/facebook/react-native.git"
-                        connection = "scm:git:https://github.com/facebook/react-native.git"
-                        developerConnection = "scm:git:git@github.com:facebook/react-native.git"
-                    }
-                }
-            }
-        }
-
-        repositories {
-            maven {
-                name = "npm"
-                url = AAR_OUTPUT_URL
-            }
-        }
-    }
 }
