@@ -71,12 +71,12 @@ public class ResourceDrawableIdHelper {
 
   public @Nullable Drawable getResourceDrawable(Context context, @Nullable String name) {
     int resId = getResourceDrawableId(context, name);
-    return resId > 0 ? context.getResources().getDrawable(resId) : null;
+    return resId != 0 ? context.getResources().getDrawable(resId) : null;
   }
 
   public Uri getResourceDrawableUri(Context context, @Nullable String name) {
     int resId = getResourceDrawableId(context, name);
-    return resId > 0
+    return resId != 0
         ? new Uri.Builder().scheme(LOCAL_RESOURCE_SCHEME).path(String.valueOf(resId)).build()
         : Uri.EMPTY;
   }
