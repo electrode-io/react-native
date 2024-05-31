@@ -28,14 +28,14 @@ def hermesiOSReleaseArtifact = artifacts.add('default', hermesiOSReleaseArtifact
 }
 
 
-apply from: "../publish.gradle"
+// apply from: "../publish.gradle"
 
-publishing {
-    publications {
-        getByName("release") {
-            artifactId 'react-native-artifacts'
-            artifact hermesiOSDebugArtifact
-            artifact hermesiOSReleaseArtifact
-        }
-    }
-}
+// publishing {
+//     publications {
+//         getByName("release") {
+//             artifactId 'react-native-artifacts'
+//             artifact hermesiOSDebugArtifact
+//             artifact hermesiOSReleaseArtifact
+//         }
+//     }
+// }

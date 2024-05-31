@@ -9,12 +9,21 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 def isNightly = findProperty("isNightly")?.toBoolean()
-def signingKey = findProperty("SIGNING_KEY")
-def signingPwd = findProperty("SIGNING_PWD")
+def signingKey = findProperty("signingKey")
+def signingPwd = findProperty("signingPassword")
 
 def reactAndroidProjectDir = project(':packages:react-native:ReactAndroid').projectDir
 def androidOutputUrl = "file://${reactAndroidProjectDir}/../android"
 def mavenTempLocalUrl = "file:///tmp/maven-local"
+
+// ERN Publish to Maven Creds
+def sonatypeUsername = findProperty("repositoryUsername")
+def sonatypePassword = findProperty("repositoryPassword")
+def ernMavenCentral = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+
+def isReleaseBuild() {
+    return VERSION_NAME.contains("SNAPSHOT") == false
+}
 
 publishing {
     publications {
@@ -73,15 +82,19 @@ publishing {
             name = "mavenTempLocal"
             url = mavenTempLocalUrl
         }
+        maven {
+            name = "ern"
+            url = ernMavenCentral
+            credentials {
+                username = sonatypeUsername
+                password = sonatypePassword
+            }
+        }
     }
 
-    if (signingKey && signingPwd) {
-        logger.info("PGP Key found - Signing enabled")
-        signing {
-            useInMemoryPgpKeys(signingKey, signingPwd)
-            sign(publishing.publications.release)
-        }
-    } else {
-        logger.info("Signing disabled as the PGP key was not found")
+    signing {
+        required { isReleaseBuild() }
+        useGpgCmd()
+        sign(publishing.publications.release)
     }
 }

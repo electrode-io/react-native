@@ -31,8 +31,8 @@ group = "com.facebook.react"
 
 val ndkPath by extra(System.getenv("ANDROID_NDK"))
 val ndkVersion by extra(System.getenv("ANDROID_NDK_VERSION"))
-val sonatypeUsername = findProperty("SONATYPE_USERNAME")?.toString()
-val sonatypePassword = findProperty("SONATYPE_PASSWORD")?.toString()
+val sonatypeUsername = findProperty("repositoryUsername")?.toString()
+val sonatypePassword = findProperty("repositoryPassword")?.toString()
 
 nexusPublishing {
   repositories {
@@ -99,9 +99,14 @@ tasks.register("publishAllToMavenTempLocal") {
       ":packages:react-native:ReactAndroid:hermes-engine:publishAllPublicationsToMavenTempLocalRepository")
 }
 
+tasks.register("publishAllPublicationsToErnRepository") {
+  description = "Publish all the artifacts to be available inside a Maven Local repository on /tmp."
+  dependsOn(":packages:react-native:ReactAndroid:publishAllPublicationsToErnRepository")
+  dependsOn(
+      ":packages:react-native:ReactAndroid:hermes-engine:publishAllPublicationsToErnRepository")
+}
+
 tasks.register("publishAllToSonatype") {
   description = "Publish all the artifacts to Sonatype (Maven Central or Snapshot repository)"
   dependsOn(":packages:react-native:ReactAndroid:publishToSonatype")
-  dependsOn(":packages:react-native:ReactAndroid:external-artifacts:publishToSonatype")
-  dependsOn(":packages:react-native:ReactAndroid:hermes-engine:publishToSonatype")
 }

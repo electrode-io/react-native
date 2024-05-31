@@ -14,7 +14,7 @@ plugins {
     id("signing")
 }
 
-group = "com.facebook.react"
+group = GROUP
 version = parent.publishing_version
 def cmakeVersion = parent.cmake_version
 

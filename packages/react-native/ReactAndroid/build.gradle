@@ -23,7 +23,7 @@ import kotlin.Pair
 import de.undercouch.gradle.tasks.download.Download
 
 version = VERSION_NAME
-group = "com.facebook.react"
+group = GROUP
 
 // We download various C++ open-source dependencies into downloads.
 // We then copy both the downloaded code and our custom makefiles and headers into third-party-ndk.
