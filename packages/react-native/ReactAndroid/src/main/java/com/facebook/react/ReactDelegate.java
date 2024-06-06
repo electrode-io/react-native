@@ -82,12 +82,15 @@ public class ReactDelegate {
   }
 
   public void onHostDestroy() {
-    if (mReactRootView != null) {
-      mReactRootView.unmountReactApplication();
-      mReactRootView = null;
+    if (this.mReactRootView != null) {
+      this.mReactRootView.unmountReactApplication();
+      this.mReactRootView = null;
     }
-    if (getReactNativeHost().hasInstance()) {
-      getReactNativeHost().getReactInstanceManager().onHostDestroy(mActivity);
+
+    if (getReactNativeHost() != null) {
+      if (getReactNativeHost().hasInstance() && getReactNativeHost().getReactInstanceManager() != null) {
+          getReactNativeHost().getReactInstanceManager().onHostDestroy(mActivity);
+      }
     }
   }
 
