@@ -99,7 +99,7 @@ public class ColorPropConverter {
   private static int resolveResource(Context context, String resourcePath) {
     String[] pathTokens = resourcePath.split(PACKAGE_DELIMITER);
 
-    String packageName = context.getPackageName();
+    String packageName = ReactApplicationContext.PACKAGE_NAME == null ? context.getPackageName() : ReactApplicationContext.PACKAGE_NAME;
     String resource = resourcePath;
 
     if (pathTokens.length > 1) {
@@ -120,7 +120,7 @@ public class ColorPropConverter {
     String path = resourcePath.replaceAll(ATTR_SEGMENT, "");
     String[] pathTokens = path.split(PACKAGE_DELIMITER);
 
-    String packageName = context.getPackageName();
+    String packageName = ReactApplicationContext.PACKAGE_NAME == null ? context.getPackageName() : ReactApplicationContext.PACKAGE_NAME;
     String resourceName = path;
 
     if (pathTokens.length > 1) {

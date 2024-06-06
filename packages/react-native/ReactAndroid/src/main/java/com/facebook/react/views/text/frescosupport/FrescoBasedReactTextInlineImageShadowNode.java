@@ -18,6 +18,7 @@ import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.uimanager.ViewProps;
 import com.facebook.react.uimanager.annotations.ReactProp;
@@ -119,7 +120,7 @@ public class FrescoBasedReactTextInlineImageShadowNode extends ReactTextInlineIm
       return null;
     }
     name = name.toLowerCase(Locale.getDefault()).replace("-", "_");
-    int resId = context.getResources().getIdentifier(name, "drawable", context.getPackageName());
+    int resId = context.getResources().getIdentifier(name, "drawable", ReactApplicationContext.PACKAGE_NAME == null ? context.getPackageName() : ReactApplicationContext.PACKAGE_NAME);
     return new Uri.Builder()
         .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
         .path(String.valueOf(resId))

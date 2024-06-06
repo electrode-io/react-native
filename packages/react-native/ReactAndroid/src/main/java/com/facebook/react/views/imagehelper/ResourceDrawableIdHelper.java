@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import androidx.annotation.Nullable;
+import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class ResourceDrawableIdHelper {
       if (mResourceDrawableIdMap.containsKey(name)) {
         return mResourceDrawableIdMap.get(name);
       }
-      int id = context.getResources().getIdentifier(name, "drawable", context.getPackageName());
+      int id = context.getResources().getIdentifier(name, "drawable", ReactApplicationContext.PACKAGE_NAME == null ? context.getPackageName() : ReactApplicationContext.PACKAGE_NAME);
       mResourceDrawableIdMap.put(name, id);
       return id;
     }
@@ -69,12 +70,12 @@ public class ResourceDrawableIdHelper {
 
   public @Nullable Drawable getResourceDrawable(Context context, @Nullable String name) {
     int resId = getResourceDrawableId(context, name);
-    return resId > 0 ? context.getResources().getDrawable(resId) : null;
+    return resId != 0 ? context.getResources().getDrawable(resId) : null;
   }
 
   public Uri getResourceDrawableUri(Context context, @Nullable String name) {
     int resId = getResourceDrawableId(context, name);
-    return resId > 0
+    return resId != 0
         ? new Uri.Builder().scheme(LOCAL_RESOURCE_SCHEME).path(String.valueOf(resId)).build()
         : Uri.EMPTY;
   }
