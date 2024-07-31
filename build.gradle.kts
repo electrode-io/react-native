@@ -102,8 +102,8 @@ tasks.register("publishAllToMavenTempLocal") {
 tasks.register("publishAllPublicationsToErnRepository") {
   description = "Publish all the artifacts to be available inside a Maven Local repository on /tmp."
   dependsOn(":packages:react-native:ReactAndroid:publishAllPublicationsToErnRepository")
-  dependsOn(
-      ":packages:react-native:ReactAndroid:hermes-engine:publishAllPublicationsToErnRepository")
+  // dependsOn(
+  //     ":packages:react-native:ReactAndroid:hermes-engine:publishAllPublicationsToErnRepository")
 }
 
 tasks.register("publishAllToSonatype") {
